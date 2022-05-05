@@ -1,0 +1,15 @@
+micronaut:
+  application:
+    name: person_show_demo_bg
+  server:
+    port: 8280
+#datasources:
+#  default:
+#    url: jdbc:mysql://192.168.2.31:3306/zhuhai
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    username: root
+#    password: '123456'
+netty:
+  default:
+    allocator:
+      max-order: 3
