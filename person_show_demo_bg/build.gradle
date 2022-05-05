@@ -1,6 +1,6 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.micronaut.application") version "3.3.2"
+    id("com.github.johnrengelman.shadow") version("7.1.2")
+    id("io.micronaut.application") version("3.3.2")
 }
 
 version = "0.1"
@@ -21,8 +21,10 @@ dependencies {
     runtimeOnly("mysql:mysql-connector-java")
     testImplementation("org.testcontainers:junit-jupiter")
 //    testImplementation("org.testcontainers:mysql")
-    testImplementation("org.testcontainers:testcontainers")
+    implementation("org.testcontainers:testcontainers")
     implementation("io.micronaut:micronaut-validation")
+    implementation("com.google.code.gson:gson:2.9.0")
+
 
 }
 

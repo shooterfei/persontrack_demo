@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import personImg from '../assets/person.png'
 import { Point } from "../interfaces"
 
-defineProps<{ msg: string, baseImg: string }>()
+defineProps<{ msg: string }>()
 const view_draw = ref<HTMLCanvasElement | null>(null)
 const img = new Image()
 img.src = personImg
@@ -113,6 +113,29 @@ onMounted(() => {
       track(dom)
     }
   }
+
+
+  let client = new WebSocket("ws://192.168.2.91:8280/chat/test/test")
+  client.onopen = (e: Event) => {
+    console.log("connect success!")
+    client.send("hello")
+  }
+
+  client.onmessage = (event: MessageEvent) => {
+    console.log(`received Data: ${event.data}`)
+  }
+
+  client.onclose = (event: CloseEvent) => {
+    if (event.wasClean) {
+      console.log(`connect closed cleanly, code=${event.code}, reason=${event.reason}`)
+    } else {
+      console.log('[close] Connection died')
+    }
+  }
+
+  client.onerror = (event: Event) => {
+    console.log(event.type)
+  }
 })
 
 
@@ -129,8 +152,8 @@ onMounted(() => {
   /*  width: 100%;
     height: 100%;*/
   color: #42b983;
-  background-image: url('../assets/base.png');
-  background-size: cover;
+  background-image: url("../assets/base.png");
+  background-size: 100% 100%;
 }
 
 #view_draw {
