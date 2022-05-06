@@ -1,11 +1,16 @@
 package com.zeusight.controller;
 
 import com.google.gson.Gson;
+import com.zeusight.config.WSManager;
+import com.zeusight.entity.ConvertInformation;
+import com.zeusight.entity.Point;
 import com.zeusight.entity.Pos3dData;
+import com.zeusight.util.CommonUtils;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
+import jakarta.inject.Inject;
 
 import java.util.Map;
 
@@ -18,11 +23,19 @@ import java.util.Map;
 @Controller("/api")
 public class ApiController {
 
+    @Inject
+    WSManager wsManager;
+
     private final Gson gson = new Gson();
+
+    private final ConvertInformation convertInformation = new ConvertInformation(new Point(0, 0),
+            new Point(800, 600),
+            20000,
+            20000);
+
     @Post(value = "/personTrack", processes = MediaType.APPLICATION_FORM_URLENCODED)
     public String personTrackCollect(@Body Map<String, Object> request) {
-        String eventType = request.get("eventType").toString();
-        if (!"pos3dUp".equals(request.get("eventType"))) {
+        if (!"pos3dUp".equals(String.valueOf(request.get("eventType")))) {
             request.forEach((key, value) -> {
                 System.out.printf("key: %s\n", key);
             });
@@ -36,9 +49,9 @@ public class ApiController {
 //            System.out.println("calculResult: " + request.get("calculResult").toString());
 //            System.out.println("data: " + request.get("data").toString());
 
-//            Pos3dData data = gson.fromJson(request.get("data").toString(), Pos3dData.class);
-//            System.out.println(request.get("data").toString());
-//            System.out.println(data.toString());
+            Pos3dData data = gson.fromJson(request.get("data").toString(), Pos3dData.class);
+
+            wsManager.send2Topic("test", CommonUtils.pos3DataProcessing(data, convertInformation));
         }
         return "success:\n" + request;
     }

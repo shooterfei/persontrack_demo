@@ -21,4 +21,6 @@
 
 - [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
 
+### 问题
+是否仅为图片中的一个区域，是否为标准矩形
 

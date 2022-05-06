@@ -24,10 +24,41 @@ public class WSManager {
         this.coll = coll;
     }
 
+
+    /**
+     * 发送消息到指定topic 中
+     *
+     * @param topic topic 名称
+     * @param message 要发送的消息
+     */
+    public void send2Topic(String topic, String message) {
+        coll.values().stream().filter(s -> String.valueOf(topic).equals(s.getUriVariables().asMap().get("topic"))).forEach(s -> s.sendSync(message));
+    }
+
+    /**
+     * 发送消息到指定topic 和 user 中
+     *
+     * @param topic topic 名称
+     * @param username 用户名
+     * @param message 要发送的消息
+     */
+    public void send2TopicAndUser(String topic, String username, String message) {
+        coll.values().stream()
+                .filter(s -> String.valueOf(topic).equals(s.getUriVariables().asMap().get("topic")) &&
+                        String.valueOf(username).equals(s.getUriVariables().asMap().get("username")))
+                .forEach(s -> s.sendSync(message));
+    }
+
+    /**
+     * 发送消息给所有已连接的用户
+     * @param message 要发送的消息
+     */
+    public void sendAll(String message) {
+        coll.values().forEach(s -> s.sendSync(message));
+    }
+
     @Override
     public String toString() {
-        return "WSManager{" +
-                "coll=" + coll +
-                '}';
+        return "WSManager{" + "coll=" + coll + '}';
     }
 }

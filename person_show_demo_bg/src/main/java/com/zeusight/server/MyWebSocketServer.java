@@ -1,6 +1,7 @@
 package com.zeusight.server;
 
 import com.zeusight.config.WSManager;
+import io.micronaut.websocket.CloseReason;
 import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import io.micronaut.websocket.annotation.OnClose;
@@ -23,7 +24,8 @@ public class MyWebSocketServer {
     WSManager wsManager;
 
     private final WebSocketBroadcaster broadcaster;
-    public MyWebSocketServer(WebSocketBroadcaster broadcaster){
+
+    public MyWebSocketServer(WebSocketBroadcaster broadcaster) {
         this.broadcaster = broadcaster;
     }
 
@@ -31,16 +33,18 @@ public class MyWebSocketServer {
     public void onOpen(String topic, String username, WebSocketSession session) {
         String msg = "[" + username + "]";
         broadcaster.broadcastSync(msg, isValid(topic, session));
-        if(wsManager.getColl().get(topic + "/" + username) != null){
+        if (wsManager.getColl().containsKey(topic + "/" + username)) {
+            session.close(new CloseReason(2001, "[failed] topic and username already exists!"));
+        } else {
             wsManager.getColl().put(topic + "/" + username, session);
         }
     }
 
     @OnMessage
     public void onMessage(String topic, String username, String message, WebSocketSession session) {
-        String msg = "[" + username + "]" + message;System.out.println(msg);
+        String msg = "[" + username + "]" + message;
+        System.out.println(msg);
         broadcaster.broadcastSync(msg, isValid(topic, session));
-
     }
 
     @OnClose
@@ -49,6 +53,7 @@ public class MyWebSocketServer {
         broadcaster.broadcastSync(msg, isValid(topic, session));
         wsManager.getColl().remove(topic + "/" + username);
     }
+
     private Predicate<WebSocketSession> isValid(String topic, WebSocketSession session) {
         return s -> s != session &&
                 topic.equalsIgnoreCase(s.getUriVariables().get("topic", String.class, null));

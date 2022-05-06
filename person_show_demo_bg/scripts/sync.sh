@@ -6,13 +6,13 @@ cd $CWD/../
 
 # Pre-synchronization Commands
 # project build
-gradle clean build
+ gradle clean build
 
 host=192.168.3.41
 username=dl
 password=zeusight
 source_dir=./build/docker/main/layers/
-target_dir=/home/dl/testJAVA/person_show_demo_bg/
+target_dir=/home/data/testJAVA/person_show_demo_bg/
 timeout=10
 
 echo "start sync"

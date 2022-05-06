@@ -19,7 +19,7 @@ const track = (dom: HTMLCanvasElement | null) => {
     drawCanvas(dom)
     setTimeout(() => {
       track(dom)
-    }, 1000 / personsData.fps)
+    }, 3000 / personsData.fps)
   }
 }
 
@@ -35,13 +35,31 @@ const cleanCanvas = (dom: HTMLCanvasElement | null) => {
 const drawCanvas = (dom: HTMLCanvasElement | null) => {
   if (dom) {
     let ctx = dom.getContext('2d')
-    personsData.data.forEach(item => {
-      if (item.queue.length < 2) {
-        item.queue = generateData(minPoint, maxPoint, 10, 2, item.queue[0])
+    if (ctx !== null) {
+      ctx.font = "24px serif";
+      ctx.fillStyle = "#FF0000"
+      ctx.textAlign = 'center'
+    }
+
+      if (pos3dQueue.length < 2) {
+        pos3dQueue = generateData(minPoint, maxPoint, 10, 2, pos3dQueue[0])
       }
-      ctx?.drawImage(img, item.queue[0].x, item.queue[0].y, 50, 50)
-      item.queue = item.queue.slice(1, item.queue.length)
-    })
+      ctx?.drawImage(img, pos3dQueue[0].x, pos3dQueue[0].y, 50, 50)
+      let t_base_x = pos3dQueue[0].x + 25
+      let t_base_y = pos3dQueue[0].y - 3
+      ctx?.fillText(String(pos3dQueue[0].tm), t_base_x, t_base_y, 100)
+      pos3dQueue = pos3dQueue.slice(1, pos3dQueue.length)
+
+    // personsData.data.forEach(item => {
+    //   if (item.queue.length < 2) {
+    //     item.queue = generateData(minPoint, maxPoint, 10, 2, item.queue[0])
+    //   }
+    //   ctx?.drawImage(img, item.queue[0].x, item.queue[0].y, 50, 50)
+    //   let t_base_x = item.queue[0].x + 25
+    //   let t_base_y = item.queue[0].y - 3
+    //   ctx?.fillText(String(item.queue[0].tm), t_base_x, t_base_y, 100)
+    //   item.queue = item.queue.slice(1, item.queue.length)
+    // })
   }
 }
 
@@ -76,9 +94,10 @@ const generateData = (min: Point, max: Point, fps: number, totalTime: number, ba
     res.push(basePoint)
   }
   while (count < fps * totalTime) {
-    let temp: { x: number; y: number } = {
+    let temp: Point = {
       x: randomOffset(baseX, min.x, max.x),
-      y: randomOffset(baseY, min.y, max.y)
+      y: randomOffset(baseY, min.y, max.y),
+      tm: Date.now()
     }
     baseX = temp.x
     baseY = temp.y
@@ -87,6 +106,38 @@ const generateData = (min: Point, max: Point, fps: number, totalTime: number, ba
   }
   return res
 }
+
+const generateData2 = (min: Point, max: Point, fps: number, totalTime: number, basePoint?: Point): Point[] => {
+  let count = 0
+  let res: Point[] = []
+  let baseX, baseY
+  if (basePoint) {
+    baseX = basePoint.x
+    baseY = basePoint.y
+  } else {
+    baseX = Math.floor(Math.random() * (max.x - min.x + 1) + min.x)
+    baseY = Math.floor(Math.random() * (max.y - min.y + 1) + min.y)
+    basePoint = {
+      x: baseX,
+      y: baseY
+    }
+    res.push(basePoint)
+  }
+  while (count < fps * totalTime) {
+    let temp: Point = {
+      x: randomOffset(baseX, min.x, max.x),
+      y: randomOffset(baseY, min.y, max.y),
+      tm: Date.now()
+    }
+    baseX = temp.x
+    baseY = temp.y
+    res.push(temp)
+    count++
+  }
+  return res
+}
+
+let pos3dQueue = generateData2(minPoint, maxPoint, 10, 2)
 
 let personsData = {
   fps: 10,
@@ -115,7 +166,7 @@ onMounted(() => {
   }
 
 
-  let client = new WebSocket("ws://192.168.2.91:8280/chat/test/test")
+  let client = new WebSocket("ws://192.168.3.41:8280/chat/test/test")
   client.onopen = (e: Event) => {
     console.log("connect success!")
     client.send("hello")
